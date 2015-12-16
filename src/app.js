@@ -1,7 +1,11 @@
 var TrafficLight = require('./trafficLight');
+var ProtocolType = require('./protocolType');
 var UdpController = require('./udpController');
+var TcpController = require('./tcpController');
+
 
 var settings = {
+    protocol: 'Udp',
     trafficLight: {
         redPin: 17,
         yellowPin: 27,
@@ -18,5 +22,15 @@ var settings = {
     }
 };
 
-var controller = new UdpController(new TrafficLight(settings.trafficLight), settings.udp);
-controller.setup();
+var protocolType = new ProtocolType();
+var trafficLight = new TrafficLight(settings.trafficLight);
+
+if (protocolType.Udp.is(settings.protocol)) {
+    var controller = new UdpController(trafficLight, settings.udp);
+    controller.setup();
+}
+
+if (protocolType.Tcp.is(settings.protocol)) {
+    var controller = new TcpController(trafficLight, settings.tcp);
+    controller.setup();
+}
