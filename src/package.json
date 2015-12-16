@@ -1,0 +1,11 @@
+{
+  "name": "traffic-light",
+  "version": "1.0.0",
+  "description": "RaspberryPi based client for Traffic Light",
+  "main": "app.js",
+  "author": "Vitali Matetski",
+  "dependencies": {
+    "enum": "^2.1.0",
+    "onoff": "^1.0.2"
+  }
+}
