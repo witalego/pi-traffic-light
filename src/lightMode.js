@@ -1,6 +1,6 @@
 var Enum = require('enum');
 
-function LightMode(){
+function LightMode() {
     return new Enum({
         'None':         0x00,
         'Green':        0x01,

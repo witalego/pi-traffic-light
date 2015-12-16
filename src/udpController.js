@@ -1,19 +1,16 @@
 var os = require('os')
 var dgram = require('dgram');
 
-function UdpController(trafficLight) {
+function UdpController(trafficLight, settings) {
     var me = this;
 
     var timeoutObject = null;
 
-    var Port = 2806;
-    var UpdateIntervalTimeout = 20000;
-
     me.setup = function() {
         var s = dgram.createSocket("udp4");
 
-        s.on('error', function(err) {
-            console.error('[UdpController] Server error:\n' + err.stack);
+        s.on('error', function(e) {
+            console.error('[UdpController] Server error:\n' + e.stack);
             s.close();
         });
 
@@ -30,7 +27,7 @@ function UdpController(trafficLight) {
                         console.warn('[UdpController] Timeout');
                         trafficLight.showInconclusive();
                     },
-                    UpdateIntervalTimeout);
+                    settings.updateIntervalTimeout);
                 }
             }
         });
@@ -40,7 +37,7 @@ function UdpController(trafficLight) {
             console.log('[UdpController] Server listening ' + address.address + ':' + address.port);
         });
 
-        s.bind(Port);
+        s.bind(settings.port);
 
         trafficLight.showInconclusive();
     };
