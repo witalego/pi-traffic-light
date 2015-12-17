@@ -18,7 +18,7 @@ var settings = {
     tcp: {
         port: 2806,
         host: 'localhost',
-        reconnectTimeout: 4 * 1000 // 4s
+        reconnectTimeout: 20 * 1000 // 20s
     }
 };
 

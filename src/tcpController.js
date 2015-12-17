@@ -4,6 +4,7 @@ function TcpController(trafficLight, settings) {
     var me = this;
 
     var timeoutObject = null;
+    var s = new net.Socket();
 
     me.setup = function() {
         var connect = function(socket) {
@@ -12,39 +13,54 @@ function TcpController(trafficLight, settings) {
                 settings.host,
                 function() {
                     console.log('[TcpController] Connected to server!');
+                    clearTimeout(timeoutObject);
                 });
         };
 
 
-        var s = new net.Socket();
-
         connect(s);
 
         s.on('error', function(e) {
-            console.error('[UdpController] Server error:\n' + e.stack);
+            console.error('[UdpController] Server error: %s', e.code);
+            trafficLight.showInconclusive();
 
-            if (e.code == 'ECONNREFUSED') {
-                console.log('[TcpController] Is the server running at ' + settings.port + '?');
+            switch (e.code){
+                case 'ECONNREFUSED':
+                    console.log('[TcpController] Is the server running at ' + settings.port + '?');
+                    console.warn('[TcpController] Timeout %ds', settings.reconnectTimeout);
 
-                s.setTimeout(
-                    settings.reconnectTimeout,
-                    function() {
-                        connect(s);
-                    });
+                    clearTimeout(timeoutObject);
+                    timeoutObject = setTimeout(
+                        function() {
+                            connect(s);
+                        },
+                        settings.reconnectTimeout);
+                    break;
 
-                console.log('[TcpController] Timeout for ' + settings.reconnectTimeout + ' seconds before trying port:' + settings.port + ' again');
+                case 'ETIMEDOUT':
+                default:
+                    console.log('[TcpController] Reconnecting');
+                    connect(s);
             }
         });
 
         s.on('data', function(data) {
-            console.log('[TcpController] Data ' + data.toString());
+            if (data && data.length == 3) {
+                if (data[0] == 0x28 && data[1] == 0x06) {
+                    console.log('[TcpController] Received %s', data[2]);
+                    trafficLight.setMode(data[2]);
+                }
+            }
+            else {
+                console.log('[TcpController] Unknown data');
+            }
         });
 
         s.on('end', function() {
             console.log('[TcpController] Disconnected from server');
         });
 
-        client.on('close', function() {
+        s.on('close', function() {
             console.log('[TcpController] Connection closed');
         });
 
