@@ -58,10 +58,12 @@ function TcpController(trafficLight, settings) {
 
         s.on('end', function() {
             console.log('[TcpController] Disconnected from server');
+            trafficLight.showInconclusive()
         });
 
         s.on('close', function() {
             console.log('[TcpController] Connection closed');
+            trafficLight.showInconclusive()
         });
 
         trafficLight.showInconclusive();
